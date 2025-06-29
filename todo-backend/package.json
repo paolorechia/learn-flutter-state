@@ -8,7 +8,12 @@
     "seed": "node scripts/seed.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": ["todo", "websocket", "mongodb", "express"],
+  "keywords": [
+    "todo",
+    "websocket",
+    "mongodb",
+    "express"
+  ],
   "author": "",
   "license": "ISC",
   "description": "WebSocket-based Todo API with MongoDB and authentication",
@@ -16,7 +21,7 @@
     "bcryptjs": "^3.0.2",
     "cors": "^2.8.5",
     "dotenv": "^17.0.0",
-    "express": "^5.1.0",
+    "express": "^4.21.2",
     "jsonwebtoken": "^9.0.2",
     "mongodb": "^6.17.0",
     "socket.io": "^4.8.1"

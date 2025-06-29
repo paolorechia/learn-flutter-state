@@ -1,0 +1,216 @@
+const express = require('express');
+const Todo = require('../models/Todo');
+const { authenticateHTTP } = require('../middleware/auth');
+
+const router = express.Router();
+
+// Apply authentication middleware to all routes
+router.use(authenticateHTTP);
+
+// GET /api/todos - Get all todos for authenticated user
+router.get('/', async (req, res) => {
+  try {
+    const options = {
+      completed: req.query.completed === 'true' ? true : req.query.completed === 'false' ? false : null,
+      priority: req.query.priority,
+      limit: parseInt(req.query.limit) || 50,
+      skip: parseInt(req.query.skip) || 0,
+      sortBy: req.query.sortBy || 'createdAt',
+      sortOrder: parseInt(req.query.sortOrder) || -1
+    };
+
+    const todos = await Todo.findByUserId(req.user._id, options);
+    
+    res.json({
+      success: true,
+      data: { todos },
+      message: 'Todos retrieved successfully'
+    });
+  } catch (error) {
+    console.error('Error fetching todos:', error);
+    res.status(500).json({
+      success: false,
+      message: error.message || 'Failed to fetch todos'
+    });
+  }
+});
+
+// POST /api/todos - Create a new todo
+router.post('/', async (req, res) => {
+  try {
+    const { title, description, priority, dueDate, tags } = req.body;
+
+    if (!title) {
+      return res.status(400).json({
+        success: false,
+        message: 'Title is required'
+      });
+    }
+
+    const todoData = {
+      title,
+      description: description || '',
+      priority: priority || 'medium',
+      dueDate: dueDate || null,
+      tags: tags || [],
+      userId: req.user._id
+    };
+
+    const todo = new Todo(todoData);
+    const savedTodo = await todo.save();
+
+    res.status(201).json({
+      success: true,
+      data: { todo: savedTodo },
+      message: 'Todo created successfully'
+    });
+  } catch (error) {
+    console.error('Error creating todo:', error);
+    res.status(400).json({
+      success: false,
+      message: error.message || 'Failed to create todo'
+    });
+  }
+});
+
+// GET /api/todos/stats - Get todo statistics (must come before /:id route)
+router.get('/stats/summary', async (req, res) => {
+  try {
+    const stats = await Todo.getStatsByUserId(req.user._id);
+
+    res.json({
+      success: true,
+      data: { stats },
+      message: 'Todo statistics retrieved successfully'
+    });
+  } catch (error) {
+    console.error('Error fetching todo stats:', error);
+    res.status(500).json({
+      success: false,
+      message: error.message || 'Failed to fetch todo statistics'
+    });
+  }
+});
+
+// GET /api/todos/search - Search todos (must come before /:id route)
+router.get('/search/:query', async (req, res) => {
+  try {
+    const { query } = req.params;
+    
+    if (!query) {
+      return res.status(400).json({
+        success: false,
+        message: 'Search query is required'
+      });
+    }
+
+    const options = {
+      limit: parseInt(req.query.limit) || 20,
+      skip: parseInt(req.query.skip) || 0
+    };
+
+    const todos = await Todo.search(req.user._id, query, options);
+    
+    res.json({
+      success: true,
+      data: { todos, query },
+      message: 'Search completed successfully'
+    });
+  } catch (error) {
+    console.error('Error searching todos:', error);
+    res.status(500).json({
+      success: false,
+      message: error.message || 'Failed to search todos'
+    });
+  }
+});
+
+// GET /api/todos/:id - Get a specific todo
+router.get('/:id', async (req, res) => {
+  try {
+    const todo = await Todo.findByIdAndUserId(req.params.id, req.user._id);
+
+    if (!todo) {
+      return res.status(404).json({
+        success: false,
+        message: 'Todo not found'
+      });
+    }
+
+    res.json({
+      success: true,
+      data: { todo },
+      message: 'Todo retrieved successfully'
+    });
+  } catch (error) {
+    console.error('Error fetching todo:', error);
+    res.status(500).json({
+      success: false,
+      message: error.message || 'Failed to fetch todo'
+    });
+  }
+});
+
+// PUT /api/todos/:id - Update a todo
+router.put('/:id', async (req, res) => {
+  try {
+    const updateData = { ...req.body };
+
+    // Remove fields that shouldn't be updated
+    delete updateData._id;
+    delete updateData.userId;
+    delete updateData.createdAt;
+
+    const updated = await Todo.updateByIdAndUserId(req.params.id, req.user._id, updateData);
+
+    if (!updated) {
+      return res.status(404).json({
+        success: false,
+        message: 'Todo not found'
+      });
+    }
+
+    // Get the updated todo
+    const updatedTodo = await Todo.findByIdAndUserId(req.params.id, req.user._id);
+
+    res.json({
+      success: true,
+      data: { todo: updatedTodo },
+      message: 'Todo updated successfully'
+    });
+  } catch (error) {
+    console.error('Error updating todo:', error);
+    res.status(400).json({
+      success: false,
+      message: error.message || 'Failed to update todo'
+    });
+  }
+});
+
+// DELETE /api/todos/:id - Delete a todo
+router.delete('/:id', async (req, res) => {
+  try {
+    const deleted = await Todo.deleteByIdAndUserId(req.params.id, req.user._id);
+
+    if (!deleted) {
+      return res.status(404).json({
+        success: false,
+        message: 'Todo not found'
+      });
+    }
+
+    res.json({
+      success: true,
+      data: { id: req.params.id },
+      message: 'Todo deleted successfully'
+    });
+  } catch (error) {
+    console.error('Error deleting todo:', error);
+    res.status(500).json({
+      success: false,
+      message: error.message || 'Failed to delete todo'
+    });
+  }
+});
+
+module.exports = router;
