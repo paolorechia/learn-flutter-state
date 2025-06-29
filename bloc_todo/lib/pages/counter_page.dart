@@ -4,6 +4,13 @@ import '../blocs/counter_bloc.dart';
 
 
 class CounterPage extends StatelessWidget {
+  const CounterPage({super.key});
+
+  static Route<void> route() {
+    return MaterialPageRoute<void>(builder: (_) => CounterPage());
+  }
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
