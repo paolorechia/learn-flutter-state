@@ -8,6 +8,7 @@ import 'repositories/random_users.dart';
 // Blocs
 import 'blocs/counter_bloc.dart';
 import 'blocs/random_user_bloc.dart';
+import 'blocs/navigation_bloc.dart';
 
 // Observers
 import 'observers/simple_bloc_observer.dart';
@@ -39,6 +40,9 @@ class BlocTodoApp extends StatelessWidget {
                 create: (context) => RandomUserBloc(
                   randomUserRepository: context.read<RandomUserRepository>()
                 ),
+              ),
+              BlocProvider<NavigationBloc>(
+                create: (context) => NavigationBloc(),
               ),
             ],
             child: const AppView(),

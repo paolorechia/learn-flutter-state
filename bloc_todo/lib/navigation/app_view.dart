@@ -1,5 +1,8 @@
-import 'package:bloc_todo/blocs/random_user_bloc.dart';
+import 'package:bloc_todo/blocs/navigation_bloc.dart';
+
 import 'package:bloc_todo/pages/random_user_page.dart';
+import 'package:bloc_todo/pages/counter_page.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -22,12 +25,22 @@ class _AppViewState extends State<AppView> {
     return MaterialApp(
       navigatorKey: _navigatorKey,
       builder: (context, child) {
-        return BlocListener<RandomUserBloc, RandomUserState>(
+        return BlocListener<NavigationBloc, NavigationState>(
           listener:(context, state) {
-            // _navigator.pushAndRemoveUntil<void>(
-            //   RandomUserPage.route(),
-            //   (route) => false,
-            // );
+            if (state.location == NavigationLocation.counter) {
+              _navigator.pushAndRemoveUntil<void>(
+                CounterPage.route(),
+                (route) => false,
+              );
+              return;
+            }
+            else if (state.location == NavigationLocation.randomUsers) {
+              _navigator.pushAndRemoveUntil<void>(
+                RandomUserPage.route(),
+                (route) => false,
+              );
+              return;
+            }
           },
           child: child,
         );

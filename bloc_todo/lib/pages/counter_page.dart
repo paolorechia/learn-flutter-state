@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../blocs/counter_bloc.dart';
+
+import 'package:bloc_todo/blocs/navigation_bloc.dart';
+import 'package:bloc_todo/blocs/counter_bloc.dart';
+
 
 
 class CounterPage extends StatelessWidget {
@@ -14,7 +17,15 @@ class CounterPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Counter')),
+      appBar: AppBar(
+        title: Text('Counter'),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.verified_user),
+            onPressed: () => context.read<NavigationBloc>().add(NavigationEventGoToRandomUsers()),
+          ),
+        ],
+      ),
       body: BlocBuilder<CounterBloc, int>(
         builder: (context, count) {
           return Center(

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:bloc_todo/blocs/random_user_bloc.dart';
 import 'package:bloc_todo/models/random_user.dart';
+import 'package:bloc_todo/blocs/navigation_bloc.dart';
 
 class RandomUserPage extends StatelessWidget {
   const RandomUserPage({super.key});
@@ -13,10 +14,16 @@ class RandomUserPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
-
     return Scaffold(
-      appBar: AppBar(title: Text('Random User Page')),
+      appBar: AppBar(
+        title: Text('Random User Page'),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.numbers),
+            onPressed: () => context.read<NavigationBloc>().add(NavigationEventGoToCounter()),
+          ),
+        ],
+      ),
       body: BlocBuilder<RandomUserBloc, RandomUserState>(
         builder: (context, state) {
           List<Widget> children = [];
