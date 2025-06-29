@@ -6,10 +6,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 // Repositories
 import 'repositories/random_users.dart';
 // Blocs
-import 'counter_bloc.dart';
+import 'blocs/counter_bloc.dart';
 
 // Pages
-import 'counter_page.dart';
+import 'pages/counter_page.dart';
 
 
 void main() async {
