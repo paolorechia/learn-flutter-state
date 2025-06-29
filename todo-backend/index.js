@@ -19,7 +19,7 @@ const server = http.createServer(app);
 // Configure Socket.IO with CORS
 const io = socketIo(server, {
   cors: {
-    origin: config.cors.origin,
+    origin: ['http://localhost:5173', 'http://localhost:3000'],
     methods: ["GET", "POST"],
     credentials: true
   }
@@ -27,8 +27,10 @@ const io = socketIo(server, {
 
 // Middleware
 app.use(cors({
-  origin: config.cors.origin,
-  credentials: true
+  origin: ['http://localhost:5173', 'http://localhost:3000'],
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
 }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));

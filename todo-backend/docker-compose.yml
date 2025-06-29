@@ -28,7 +28,7 @@ services:
       PORT: 3000
       MONGODB_URI: mongodb://admin:password123@mongodb:27017/todoapp?authSource=admin
       JWT_SECRET: your-super-secret-jwt-key-change-in-production
-      CORS_ORIGIN: http://localhost:3000
+      CORS_ORIGIN: http://localhost:5173
     ports:
       - "3000:3000"
     volumes:
