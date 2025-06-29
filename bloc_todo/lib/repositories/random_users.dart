@@ -1,4 +1,5 @@
-import '../apis/random_user.dart';
+import 'package:bloc_todo/models/random_user.dart';
+import 'package:bloc_todo/apis/random_user.dart';
 
 class RandomUserRepository {
   RandomUserRepository() {
