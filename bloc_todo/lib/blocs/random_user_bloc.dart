@@ -50,7 +50,7 @@ class RandomUserBloc extends Bloc<RandomUserEvent, RandomUserState> {
     emit(
       RandomUserState._(
         status: RandomUserRequestStatus.loading,
-        users: state.users, // Keep existing users during loading
+        users: [],
       )
     );
     

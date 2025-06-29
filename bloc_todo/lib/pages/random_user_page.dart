@@ -14,20 +14,21 @@ class RandomUserPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
 
-    List<Widget> children = [
-      ElevatedButton(
-        child: Text('Load users'),
-        onPressed: () => context.read<RandomUserBloc>().add(RandomUserEventRequested()),
-      )
-    ];
 
     return Scaffold(
       appBar: AppBar(title: Text('Random User Page')),
       body: BlocBuilder<RandomUserBloc, RandomUserState>(
         builder: (context, state) {
-          print(state.status);
+          List<Widget> children = [];
+          
           if (state.status == RandomUserRequestStatus.loading) {
             children.add(Text('Loading...'));
+          } else {
+            children.add(
+              ElevatedButton(
+              child: Text('Load users'),
+              onPressed: () => context.read<RandomUserBloc>().add(RandomUserEventRequested()),
+            ));
           }
 
           if (state.status == RandomUserRequestStatus.success) {
