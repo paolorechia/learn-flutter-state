@@ -16,22 +16,24 @@ class LoginPage extends StatelessWidget {
       appBar: AppBar(title: Text('Login')),
       body: BlocBuilder<AuthenticationBloc, AuthenticationState>(
         builder: (context, state) {
-          return Center(child: FormExample());
+          return Center(child: LoginForm());
         },
       ),
     );
   }
 }
 
-class FormExample extends StatefulWidget {
-  const FormExample({super.key});
+class LoginForm extends StatefulWidget {
+  const LoginForm({super.key});
 
   @override
-  State<FormExample> createState() => _FormExampleState();
+  State<LoginForm> createState() => _LoginFormState();
 }
 
-class _FormExampleState extends State<FormExample> {
+class _LoginFormState extends State<LoginForm> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final usernameController = TextEditingController();
+  final passwordController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -48,6 +50,17 @@ class _FormExampleState extends State<FormExample> {
               }
               return null;
             },
+            controller: usernameController,
+          ),
+          TextFormField(
+            decoration: const InputDecoration(hintText: 'Enter your password'),
+            validator: (String? value) {
+              if (value == null || value.isEmpty) {
+                return 'Please enter some password';
+              }
+              return null;
+            },
+            controller: passwordController,
           ),
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 16.0),
@@ -56,7 +69,12 @@ class _FormExampleState extends State<FormExample> {
                 // Validate will return true if the form is valid, or false if
                 // the form is invalid.
                 if (_formKey.currentState!.validate()) {
-                  // Process data.
+                  context.read<AuthenticationBloc>().add(
+                    SignInEvent(
+                      username: usernameController.text,
+                      password: passwordController.text,
+                    ),
+                  );
                 }
               },
               child: const Text('Submit'),
@@ -65,5 +83,13 @@ class _FormExampleState extends State<FormExample> {
         ],
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    // Clean up the controller when the widget is disposed.
+    usernameController.dispose();
+    passwordController.dispose();
+    super.dispose();
   }
 }
