@@ -7,6 +7,75 @@ const router = express.Router();
 // Apply authentication middleware to all routes
 router.use(authenticateHTTP);
 
+/**
+ * @swagger
+ * /api/todos:
+ *   get:
+ *     summary: Get all todos for authenticated user
+ *     tags: [Todos]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: completed
+ *         schema:
+ *           type: boolean
+ *         description: Filter by completion status
+ *       - in: query
+ *         name: priority
+ *         schema:
+ *           type: string
+ *           enum: [low, medium, high]
+ *         description: Filter by priority
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           default: 50
+ *         description: Number of todos to return
+ *       - in: query
+ *         name: skip
+ *         schema:
+ *           type: integer
+ *           default: 0
+ *         description: Number of todos to skip
+ *       - in: query
+ *         name: sortBy
+ *         schema:
+ *           type: string
+ *           default: createdAt
+ *         description: Field to sort by
+ *       - in: query
+ *         name: sortOrder
+ *         schema:
+ *           type: integer
+ *           enum: [1, -1]
+ *           default: -1
+ *         description: Sort order (1 for ascending, -1 for descending)
+ *     responses:
+ *       200:
+ *         description: Todos retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               allOf:
+ *                 - $ref: '#/components/schemas/ApiResponse'
+ *                 - type: object
+ *                   properties:
+ *                     data:
+ *                       type: object
+ *                       properties:
+ *                         todos:
+ *                           type: array
+ *                           items:
+ *                             $ref: '#/components/schemas/Todo'
+ *       401:
+ *         description: Unauthorized
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ */
 // GET /api/todos - Get all todos for authenticated user
 router.get('/', async (req, res) => {
   try {
@@ -35,6 +104,48 @@ router.get('/', async (req, res) => {
   }
 });
 
+/**
+ * @swagger
+ * /api/todos:
+ *   post:
+ *     summary: Create a new todo
+ *     tags: [Todos]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/TodoInput'
+ *     responses:
+ *       201:
+ *         description: Todo created successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               allOf:
+ *                 - $ref: '#/components/schemas/ApiResponse'
+ *                 - type: object
+ *                   properties:
+ *                     data:
+ *                       type: object
+ *                       properties:
+ *                         todo:
+ *                           $ref: '#/components/schemas/Todo'
+ *       400:
+ *         description: Validation error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *       401:
+ *         description: Unauthorized
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ */
 // POST /api/todos - Create a new todo
 router.post('/', async (req, res) => {
   try {
@@ -125,6 +236,116 @@ router.get('/search/:query', async (req, res) => {
   }
 });
 
+/**
+ * @swagger
+ * /api/todos/{id}:
+ *   get:
+ *     summary: Get a specific todo
+ *     tags: [Todos]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Todo ID
+ *     responses:
+ *       200:
+ *         description: Todo retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               allOf:
+ *                 - $ref: '#/components/schemas/ApiResponse'
+ *                 - type: object
+ *                   properties:
+ *                     data:
+ *                       type: object
+ *                       properties:
+ *                         todo:
+ *                           $ref: '#/components/schemas/Todo'
+ *       404:
+ *         description: Todo not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *   put:
+ *     summary: Update a todo
+ *     tags: [Todos]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Todo ID
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/TodoInput'
+ *     responses:
+ *       200:
+ *         description: Todo updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               allOf:
+ *                 - $ref: '#/components/schemas/ApiResponse'
+ *                 - type: object
+ *                   properties:
+ *                     data:
+ *                       type: object
+ *                       properties:
+ *                         todo:
+ *                           $ref: '#/components/schemas/Todo'
+ *       404:
+ *         description: Todo not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *   delete:
+ *     summary: Delete a todo
+ *     tags: [Todos]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Todo ID
+ *     responses:
+ *       200:
+ *         description: Todo deleted successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               allOf:
+ *                 - $ref: '#/components/schemas/ApiResponse'
+ *                 - type: object
+ *                   properties:
+ *                     data:
+ *                       type: object
+ *                       properties:
+ *                         id:
+ *                           type: string
+ *                           description: Deleted todo ID
+ *       404:
+ *         description: Todo not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ */
 // GET /api/todos/:id - Get a specific todo
 router.get('/:id', async (req, res) => {
   try {
