@@ -4,15 +4,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:bloc_todo/blocs/navigation_bloc.dart';
 import 'package:bloc_todo/blocs/counter_bloc.dart';
 
-
-
 class CounterPage extends StatelessWidget {
   const CounterPage({super.key});
 
   static Route<void> route() {
     return MaterialPageRoute<void>(builder: (_) => CounterPage());
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -22,17 +19,16 @@ class CounterPage extends StatelessWidget {
         actions: [
           IconButton(
             icon: Icon(Icons.verified_user),
-            onPressed: () => context.read<NavigationBloc>().add(NavigationEventGoToRandomUsers()),
+            onPressed: () => context.read<NavigationBloc>().add(
+              NavigationEventGoToRandomUsers(),
+            ),
           ),
         ],
       ),
       body: BlocBuilder<CounterBloc, int>(
         builder: (context, count) {
           return Center(
-            child: Text(
-              '$count',
-              style: TextStyle(fontSize: 24.0),
-            ),
+            child: Text('$count', style: TextStyle(fontSize: 24.0)),
           );
         },
       ),
@@ -44,7 +40,8 @@ class CounterPage extends StatelessWidget {
             padding: EdgeInsets.symmetric(vertical: 5.0),
             child: FloatingActionButton(
               child: Icon(Icons.add),
-              onPressed: () => context.read<CounterBloc>().add(CounterIncrementPressed()),
+              onPressed: () =>
+                  context.read<CounterBloc>().add(CounterIncrementPressed()),
             ),
           ),
         ],

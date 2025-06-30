@@ -7,5 +7,4 @@ class CounterCubit extends Cubit<int> {
     addError(Exception('increment error!'), StackTrace.current);
     emit(state + 1);
   }
-
 }

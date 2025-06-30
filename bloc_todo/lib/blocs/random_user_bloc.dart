@@ -9,7 +9,6 @@ sealed class RandomUserEvent {}
 
 final class RandomUserEventRequested extends RandomUserEvent {}
 
-
 enum RandomUserRequestStatus { initial, loading, success, failure }
 
 // state
@@ -28,13 +27,11 @@ class RandomUserState extends Equatable {
   List<Object> get props => [status, users];
 }
 
-
 // bloc
 class RandomUserBloc extends Bloc<RandomUserEvent, RandomUserState> {
-  RandomUserBloc(
-    {required RandomUserRepository randomUserRepository}
-  ): _randomUserRepository = randomUserRepository, super(const RandomUserState()) {
-
+  RandomUserBloc({required RandomUserRepository randomUserRepository})
+    : _randomUserRepository = randomUserRepository,
+      super(const RandomUserState()) {
     on<RandomUserEventRequested>(
       _onRandomUserEventRequested,
       transformer: restartable(),
@@ -47,18 +44,14 @@ class RandomUserBloc extends Bloc<RandomUserEvent, RandomUserState> {
     RandomUserEventRequested event,
     Emitter<RandomUserState> emit,
   ) async {
-    emit(
-      RandomUserState._(
-        status: RandomUserRequestStatus.loading,
-        users: [],
-      )
-    );
-    
+    emit(RandomUserState._(status: RandomUserRequestStatus.loading, users: []));
+
     print("Fetching...");
 
     try {
       await Future.delayed(Duration(seconds: 1));
-      List<RandomUser> randomUsers = await _randomUserRepository.getRandomUsers();
+      List<RandomUser> randomUsers = await _randomUserRepository
+          .getRandomUsers();
       print("Fetched random user ${randomUsers}");
       emit(
         RandomUserState._(
@@ -76,9 +69,4 @@ class RandomUserBloc extends Bloc<RandomUserEvent, RandomUserState> {
       );
     }
   }
-
 }
-
-
-
-

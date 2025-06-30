@@ -6,7 +6,6 @@ import 'package:bloc_todo/pages/counter_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-
 class AppView extends StatefulWidget {
   const AppView({super.key});
 
@@ -19,22 +18,20 @@ class _AppViewState extends State<AppView> {
 
   NavigatorState get _navigator => _navigatorKey.currentState!;
 
-
   @override
-  Widget build(BuildContext context) { 
+  Widget build(BuildContext context) {
     return MaterialApp(
       navigatorKey: _navigatorKey,
       builder: (context, child) {
         return BlocListener<NavigationBloc, NavigationState>(
-          listener:(context, state) {
+          listener: (context, state) {
             if (state.location == NavigationLocation.counter) {
               _navigator.pushAndRemoveUntil<void>(
                 CounterPage.route(),
                 (route) => false,
               );
               return;
-            }
-            else if (state.location == NavigationLocation.randomUsers) {
+            } else if (state.location == NavigationLocation.randomUsers) {
               _navigator.pushAndRemoveUntil<void>(
                 RandomUserPage.route(),
                 (route) => false,

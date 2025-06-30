@@ -29,26 +29,21 @@ class BlocTodoApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       home: RepositoryProvider(
-          create: (_) => RandomUserRepository(),
-          dispose: (repository) => repository.dispose(),
-          child: MultiBlocProvider(
-            providers: [
-              BlocProvider<CounterBloc>(
-                create: (context) => CounterBloc(),
+        create: (_) => RandomUserRepository(),
+        dispose: (repository) => repository.dispose(),
+        child: MultiBlocProvider(
+          providers: [
+            BlocProvider<CounterBloc>(create: (context) => CounterBloc()),
+            BlocProvider<RandomUserBloc>(
+              create: (context) => RandomUserBloc(
+                randomUserRepository: context.read<RandomUserRepository>(),
               ),
-              BlocProvider<RandomUserBloc>(
-                create: (context) => RandomUserBloc(
-                  randomUserRepository: context.read<RandomUserRepository>()
-                ),
-              ),
-              BlocProvider<NavigationBloc>(
-                create: (context) => NavigationBloc(),
-              ),
-            ],
-            child: const AppView(),
-          ),
+            ),
+            BlocProvider<NavigationBloc>(create: (context) => NavigationBloc()),
+          ],
+          child: const AppView(),
+        ),
       ),
     );
   }
 }
-

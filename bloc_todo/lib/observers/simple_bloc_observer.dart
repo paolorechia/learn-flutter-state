@@ -19,7 +19,6 @@ class SimpleBlocObserver extends BlocObserver {
     print('${bloc.runtimeType} $transition');
   }
 
-
   @override
   void onEvent(Bloc bloc, Object? event) {
     super.onEvent(bloc, event);

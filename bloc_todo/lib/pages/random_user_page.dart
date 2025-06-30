@@ -11,7 +11,6 @@ class RandomUserPage extends StatelessWidget {
     return MaterialPageRoute<void>(builder: (_) => RandomUserPage());
   }
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -20,22 +19,27 @@ class RandomUserPage extends StatelessWidget {
         actions: [
           IconButton(
             icon: Icon(Icons.numbers),
-            onPressed: () => context.read<NavigationBloc>().add(NavigationEventGoToCounter()),
+            onPressed: () => context.read<NavigationBloc>().add(
+              NavigationEventGoToCounter(),
+            ),
           ),
         ],
       ),
       body: BlocBuilder<RandomUserBloc, RandomUserState>(
         builder: (context, state) {
           List<Widget> children = [];
-          
+
           if (state.status == RandomUserRequestStatus.loading) {
             children.add(Text('Loading...'));
           } else {
             children.add(
               ElevatedButton(
-              child: Text('Load users'),
-              onPressed: () => context.read<RandomUserBloc>().add(RandomUserEventRequested()),
-            ));
+                child: Text('Load users'),
+                onPressed: () => context.read<RandomUserBloc>().add(
+                  RandomUserEventRequested(),
+                ),
+              ),
+            );
           }
 
           if (state.status == RandomUserRequestStatus.success) {
@@ -52,12 +56,8 @@ class RandomUserPage extends StatelessWidget {
             }
           }
 
-          return Center(
-            child: Column(
-              children: children,
-            )
-          );
-        }
+          return Center(child: Column(children: children));
+        },
       ),
     );
   }

@@ -18,7 +18,6 @@ class RandomResult extends Equatable {
   List<Object> get props => [results];
 }
 
-
 class RandomUser extends Equatable {
   final String gender;
   final String email;

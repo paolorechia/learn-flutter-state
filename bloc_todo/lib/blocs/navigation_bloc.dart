@@ -6,6 +6,7 @@ import 'package:bloc_concurrency/bloc_concurrency.dart';
 sealed class NavigationEvent {}
 
 final class NavigationEventGoToCounter extends NavigationEvent {}
+
 final class NavigationEventGoToRandomUsers extends NavigationEvent {}
 
 enum NavigationLocation { counter, randomUsers }
@@ -14,16 +15,14 @@ enum NavigationLocation { counter, randomUsers }
 class NavigationState extends Equatable {
   final NavigationLocation location;
 
-  const NavigationState._({
-    required this.location,
-  });
+  const NavigationState._({required this.location});
 
-  const NavigationState(NavigationLocation location) : this._(location: location);
+  const NavigationState(NavigationLocation location)
+    : this._(location: location);
 
   @override
   List<Object> get props => [location];
 }
-
 
 // bloc
 class NavigationBloc extends Bloc<NavigationEvent, NavigationState> {
@@ -42,17 +41,13 @@ class NavigationBloc extends Bloc<NavigationEvent, NavigationState> {
     NavigationEventGoToCounter event,
     Emitter<NavigationState> emit,
   ) async {
-      emit(
-        NavigationState(NavigationLocation.counter)
-      );
+    emit(NavigationState(NavigationLocation.counter));
   }
 
   void _onNavigateToRandomUsers(
     NavigationEventGoToRandomUsers event,
     Emitter<NavigationState> emit,
   ) async {
-      emit(
-        NavigationState(NavigationLocation.randomUsers)
-      );
+    emit(NavigationState(NavigationLocation.randomUsers));
   }
 }
