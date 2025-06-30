@@ -1,3 +1,4 @@
+import 'package:bloc_todo/blocs/authentication_bloc.dart';
 import 'package:bloc_todo/blocs/navigation_bloc.dart';
 
 import 'package:bloc_todo/pages/random_user_page.dart';
@@ -24,31 +25,41 @@ class _AppViewState extends State<AppView> {
     return MaterialApp(
       navigatorKey: _navigatorKey,
       builder: (context, child) {
-        return BlocListener<NavigationBloc, NavigationState>(
+        return BlocListener<AuthenticationBloc, AuthenticationState>(
           listener: (context, state) {
-            if (state.location == NavigationLocation.counter) {
-              _navigator.pushAndRemoveUntil<void>(
-                CounterPage.route(),
-                (route) => false,
-              );
+            print("Received authentication event");
+            print(state.status);
+            if (state.status == AuthenticationStatus.authenticated) {
+              context.read<NavigationBloc>().add(NavigationEventGoToCounter());
               return;
-            } else if (state.location == NavigationLocation.randomUsers) {
-              _navigator.pushAndRemoveUntil<void>(
-                RandomUserPage.route(),
-                (route) => false,
-              );
-              return;
-            } else if (state.location == NavigationLocation.login) {
-              _navigator.pushAndRemoveUntil<void>(
-                LoginPage.route(),
-                (route) => false,
-              );
             }
           },
-          child: child,
+          child: BlocListener<NavigationBloc, NavigationState>(
+            listener: (context, state) {
+              if (state.location == NavigationLocation.counter) {
+                _navigator.pushAndRemoveUntil<void>(
+                  CounterPage.route(),
+                  (route) => false,
+                );
+                return;
+              } else if (state.location == NavigationLocation.randomUsers) {
+                _navigator.pushAndRemoveUntil<void>(
+                  RandomUserPage.route(),
+                  (route) => false,
+                );
+                return;
+              } else if (state.location == NavigationLocation.login) {
+                _navigator.pushAndRemoveUntil<void>(
+                  LoginPage.route(),
+                  (route) => false,
+                );
+              }
+            },
+            child: child,
+          ),
         );
       },
-      onGenerateRoute: (_) => CounterPage.route(),
+      onGenerateRoute: (_) => LoginPage.route(),
     );
   }
 }
