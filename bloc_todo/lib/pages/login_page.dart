@@ -77,6 +77,7 @@ class _LoginFormState extends State<LoginForm> {
             controller: usernameController,
           ),
           TextFormField(
+            obscureText: true,
             decoration: const InputDecoration(
               hintText: 'Enter your password',
               border: OutlineInputBorder(),
