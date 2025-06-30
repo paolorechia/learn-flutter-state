@@ -1,15 +1,16 @@
+import 'package:bloc_todo/models/user.dart';
 import 'package:equatable/equatable.dart';
 
 
 class AuthenticationResult extends Equatable {
     final String token;
-    final bool isAuthenticated;
+    final User? user;
 
     const AuthenticationResult({
       required this.token,
-      required this.isAuthenticated,
+      this.user,
     });
 
     @override
-    List<Object> get props => [token, isAuthenticated];
+    List<Object> get props => [token];
 }
