@@ -1,9 +1,11 @@
 // Library imports
+import 'package:bloc_todo/blocs/authentication_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 // Repositories
 import 'repositories/random_users.dart';
+import 'repositories/authentication.dart';
 
 // Blocs
 import 'blocs/counter_bloc.dart';
@@ -28,9 +30,17 @@ class BlocTodoApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: RepositoryProvider(
-        create: (_) => RandomUserRepository(),
-        dispose: (repository) => repository.dispose(),
+      home: MultiRepositoryProvider(
+        providers: [
+          RepositoryProvider(
+            create: (_) => RandomUserRepository(),
+            dispose: (repository) => repository.dispose(),
+          ),
+          RepositoryProvider(
+            create: (context) => AuthenticationRepository(),
+            dispose: (repository) => repository.dispose(),
+          ),
+        ],
         child: MultiBlocProvider(
           providers: [
             BlocProvider<CounterBloc>(create: (context) => CounterBloc()),
@@ -40,6 +50,12 @@ class BlocTodoApp extends StatelessWidget {
               ),
             ),
             BlocProvider<NavigationBloc>(create: (context) => NavigationBloc()),
+            BlocProvider<AuthenticationBloc>(
+              create: (context) => AuthenticationBloc(
+                authenticationRepository: context
+                    .read<AuthenticationRepository>(),
+              ),
+            ),
           ],
           child: const AppView(),
         ),
