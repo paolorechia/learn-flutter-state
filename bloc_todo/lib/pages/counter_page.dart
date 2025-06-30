@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import 'package:bloc_todo/blocs/authentication_bloc.dart';
 import 'package:bloc_todo/blocs/navigation_bloc.dart';
 import 'package:bloc_todo/blocs/counter_bloc.dart';
 
@@ -22,6 +23,11 @@ class CounterPage extends StatelessWidget {
             onPressed: () => context.read<NavigationBloc>().add(
               NavigationEventGoToRandomUsers(),
             ),
+          ),
+          IconButton(
+            icon: Icon(Icons.logout),
+            onPressed: () =>
+                context.read<AuthenticationBloc>().add(SignOutEvent()),
           ),
         ],
       ),

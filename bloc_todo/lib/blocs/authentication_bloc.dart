@@ -30,6 +30,16 @@ class AuthenticationState {
     this.token = "",
     this.status = AuthenticationStatus.unknown,
   });
+
+  AuthenticationState.unauthenticated({
+    this.token = "",
+    this.status = AuthenticationStatus.unauthenticated,
+  });
+
+  AuthenticationState.loading({
+    this.token = "",
+    this.status = AuthenticationStatus.loading,
+  });
 }
 
 // bloc
@@ -40,6 +50,7 @@ class AuthenticationBloc
   }) : _authenticationRepository = authenticationRepository,
        super(AuthenticationState()) {
     on<SignInEvent>(_onSignInEvent, transformer: sequential());
+    on<SignOutEvent>(_onSignOutEvent, transformer: sequential());
   }
 
   final AuthenticationRepository _authenticationRepository;
@@ -48,13 +59,7 @@ class AuthenticationBloc
     SignInEvent event,
     Emitter<AuthenticationState> emit,
   ) async {
-    emit(
-      AuthenticationState(
-        token: "",
-        user: null,
-        status: AuthenticationStatus.loading,
-      ),
-    );
+    emit(AuthenticationState.loading());
 
     try {
       var authenticationResult = await _authenticationRepository.login(
@@ -69,13 +74,11 @@ class AuthenticationBloc
         ),
       );
     } catch (error) {
-      emit(
-        AuthenticationState(
-          token: "",
-          user: null,
-          status: AuthenticationStatus.unauthenticated,
-        ),
-      );
+      emit(AuthenticationState.unauthenticated());
     }
+  }
+
+  void _onSignOutEvent(SignOutEvent event, Emitter<AuthenticationState> emit) {
+    emit(AuthenticationState.unauthenticated());
   }
 }

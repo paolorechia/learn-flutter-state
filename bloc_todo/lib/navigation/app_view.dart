@@ -36,6 +36,9 @@ class _AppViewState extends State<AppView> {
             if (state.status == AuthenticationStatus.authenticated) {
               context.read<NavigationBloc>().add(NavigationEventGoToCounter());
               return;
+            } else {
+              context.read<NavigationBloc>().add(NavigationEventGoToLogin());
+              return;
             }
           },
           child: BlocListener<NavigationBloc, NavigationState>(
