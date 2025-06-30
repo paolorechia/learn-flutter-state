@@ -9,7 +9,9 @@ final class NavigationEventGoToCounter extends NavigationEvent {}
 
 final class NavigationEventGoToRandomUsers extends NavigationEvent {}
 
-enum NavigationLocation { counter, randomUsers }
+final class NavigationEventGoToLogin extends NavigationEvent {}
+
+enum NavigationLocation { counter, randomUsers, login }
 
 // state
 class NavigationState extends Equatable {
@@ -35,6 +37,10 @@ class NavigationBloc extends Bloc<NavigationEvent, NavigationState> {
       _onNavigateToRandomUsers,
       transformer: restartable(),
     );
+    on<NavigationEventGoToLogin>(
+      _onNavigateToLogin,
+      transformer: restartable(),
+    );
   }
 
   void _onNavigateToCounter(
@@ -49,5 +55,12 @@ class NavigationBloc extends Bloc<NavigationEvent, NavigationState> {
     Emitter<NavigationState> emit,
   ) async {
     emit(NavigationState(NavigationLocation.randomUsers));
+  }
+
+  void _onNavigateToLogin(
+    NavigationEventGoToLogin event,
+    Emitter<NavigationState> emit,
+  ) async {
+    emit(NavigationState(NavigationLocation.login));
   }
 }

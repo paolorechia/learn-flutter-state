@@ -38,12 +38,17 @@ class _AppViewState extends State<AppView> {
                 (route) => false,
               );
               return;
+            } else if (state.location == NavigationLocation.login) {
+              _navigator.pushAndRemoveUntil<void>(
+                LoginPage.route(),
+                (route) => false,
+              );
             }
           },
           child: child,
         );
       },
-      onGenerateRoute: (_) => LoginPage.route(),
+      onGenerateRoute: (_) => CounterPage.route(),
     );
   }
 }
