@@ -4,13 +4,13 @@ import 'package:bloc_todo/models/user.dart';
 
 class AuthenticationRepository {
   AuthenticationRepository() {
-    print('AuthenticationRepository created');
+    logger.i('AuthenticationRepository created');
   }
 
   AuthenticationRepository.injected({required this.expressApi}) {
-    print('AuthenticationRepository created');
-    print('AuthenticationRepository created with injected test api');
-    this.expressApi = expressApi;
+    logger.i('AuthenticationRepository created');
+    logger.i('AuthenticationRepository created with injected test api');
+    expressApi = expressApi;
   }
 
   ExpressApi expressApi = ExpressApi();
@@ -28,6 +28,6 @@ class AuthenticationRepository {
   }
 
   void dispose() {
-    print('AuthenticationRepository disposed');
+    logger.i('AuthenticationRepository disposed');
   }
 }

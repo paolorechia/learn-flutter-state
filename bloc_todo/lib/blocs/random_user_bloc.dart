@@ -46,20 +46,20 @@ class RandomUserBloc extends Bloc<RandomUserEvent, RandomUserState> {
   ) async {
     emit(RandomUserState._(status: RandomUserRequestStatus.loading, users: []));
 
-    print("Fetching...");
+    logger.i("Fetching...");
 
     try {
       await Future.delayed(Duration(seconds: 1));
       List<RandomUser> randomUsers = await _randomUserRepository
           .getRandomUsers();
-      print("Fetched random user ${randomUsers}");
+      logger.i("Fetched random user ${randomUsers}");
       emit(
         RandomUserState._(
           status: RandomUserRequestStatus.success,
           users: randomUsers,
         ),
       );
-      print("Emitted success");
+      logger.i("Emitted success");
     } catch (error) {
       emit(
         RandomUserState._(

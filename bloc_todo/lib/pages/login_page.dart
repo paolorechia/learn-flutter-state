@@ -14,7 +14,17 @@ class LoginPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text('Login')),
-      body: BlocBuilder<AuthenticationBloc, AuthenticationState>(
+      body: BlocConsumer<AuthenticationBloc, AuthenticationState>(
+        listener: (context, state) {
+          if (state.status == AuthenticationStatus.unauthenticated) {
+            const snackBar = SnackBar(
+              content: Text(
+                'Failed to authenticate, please check your credentials.',
+              ),
+            );
+            ScaffoldMessenger.of(context).showSnackBar(snackBar);
+          }
+        },
         builder: (context, state) {
           return Center(child: LoginForm());
         },

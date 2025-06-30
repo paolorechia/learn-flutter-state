@@ -1,4 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:logger/logger.dart';
+
+var logger = Logger();
 
 sealed class CounterEvent {}
 
@@ -15,6 +18,6 @@ class CounterBloc extends Bloc<CounterEvent, int> {
   @override
   void onTransition(Transition<CounterEvent, int> transition) {
     super.onTransition(transition);
-    print(transition);
+    logger.i(transition);
   }
 }

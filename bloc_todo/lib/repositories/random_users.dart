@@ -1,9 +1,12 @@
 import 'package:bloc_todo/models/random_user.dart';
 import 'package:bloc_todo/apis/random_user.dart';
+import 'package:logger/logger.dart';
+
+var logger = Logger();
 
 class RandomUserRepository {
   RandomUserRepository() {
-    print('RandomUserRepository created');
+    logger.i('RandomUserRepository created');
   }
 
   Future<List<RandomUser>> getRandomUsers() async {
@@ -11,6 +14,6 @@ class RandomUserRepository {
   }
 
   void dispose() {
-    print('RandomUserRepository disposed');
+    logger.i('RandomUserRepository disposed');
   }
 }

@@ -8,6 +8,10 @@ import 'package:bloc_todo/pages/login_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import 'package:logger/logger.dart';
+
+var logger = Logger();
+
 class AppView extends StatefulWidget {
   const AppView({super.key});
 
@@ -27,8 +31,8 @@ class _AppViewState extends State<AppView> {
       builder: (context, child) {
         return BlocListener<AuthenticationBloc, AuthenticationState>(
           listener: (context, state) {
-            print("Received authentication event");
-            print(state.status);
+            logger.i("Received authentication event");
+            logger.i(state.status);
             if (state.status == AuthenticationStatus.authenticated) {
               context.read<NavigationBloc>().add(NavigationEventGoToCounter());
               return;
