@@ -28,8 +28,12 @@ class LoginPage extends StatelessWidget {
         builder: (context, state) {
           return Center(
             child: Container(
-              padding: EdgeInsets.symmetric(vertical: 70.0),
+              padding: EdgeInsets.all(70.0),
               width: 500.0,
+              height: 400.0,
+              decoration: BoxDecoration(
+                border: Border.all(color: Colors.blueAccent),
+              ),
               child: LoginForm(),
             ),
           );
@@ -60,7 +64,10 @@ class _LoginFormState extends State<LoginForm> {
         spacing: 20.0,
         children: <Widget>[
           TextFormField(
-            decoration: const InputDecoration(hintText: 'Enter your email'),
+            decoration: const InputDecoration(
+              hintText: 'Enter your email',
+              border: OutlineInputBorder(),
+            ),
             validator: (String? value) {
               if (value == null || value.isEmpty) {
                 return 'Please enter some text';
@@ -70,7 +77,10 @@ class _LoginFormState extends State<LoginForm> {
             controller: usernameController,
           ),
           TextFormField(
-            decoration: const InputDecoration(hintText: 'Enter your password'),
+            decoration: const InputDecoration(
+              hintText: 'Enter your password',
+              border: OutlineInputBorder(),
+            ),
             validator: (String? value) {
               if (value == null || value.isEmpty) {
                 return 'Please enter some password';
