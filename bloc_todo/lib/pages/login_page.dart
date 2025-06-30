@@ -26,7 +26,13 @@ class LoginPage extends StatelessWidget {
           }
         },
         builder: (context, state) {
-          return Center(child: LoginForm());
+          return Center(
+            child: Container(
+              padding: EdgeInsets.symmetric(vertical: 70.0),
+              width: 500.0,
+              child: LoginForm(),
+            ),
+          );
         },
       ),
     );
@@ -51,6 +57,7 @@ class _LoginFormState extends State<LoginForm> {
       key: _formKey,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
+        spacing: 20.0,
         children: <Widget>[
           TextFormField(
             decoration: const InputDecoration(hintText: 'Enter your email'),
@@ -72,22 +79,24 @@ class _LoginFormState extends State<LoginForm> {
             },
             controller: passwordController,
           ),
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 16.0),
-            child: ElevatedButton(
-              onPressed: () {
-                // Validate will return true if the form is valid, or false if
-                // the form is invalid.
-                if (_formKey.currentState!.validate()) {
-                  context.read<AuthenticationBloc>().add(
-                    SignInEvent(
-                      username: usernameController.text,
-                      password: passwordController.text,
-                    ),
-                  );
-                }
-              },
-              child: const Text('Submit'),
+          Center(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 30.0),
+              child: ElevatedButton(
+                onPressed: () {
+                  // Validate will return true if the form is valid, or false if
+                  // the form is invalid.
+                  if (_formKey.currentState!.validate()) {
+                    context.read<AuthenticationBloc>().add(
+                      SignInEvent(
+                        username: usernameController.text,
+                        password: passwordController.text,
+                      ),
+                    );
+                  }
+                },
+                child: const Text('Submit'),
+              ),
             ),
           ),
         ],

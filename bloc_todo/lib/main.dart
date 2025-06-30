@@ -63,7 +63,7 @@ class BlocTodoApp extends StatelessWidget {
       theme: ThemeData(
         // Define the default brightness and colors.
         colorScheme: ColorScheme.fromSeed(
-          seedColor: Colors.purple,
+          seedColor: Colors.blue,
           // ···
           brightness: Brightness.dark,
         ),
