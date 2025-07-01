@@ -1,6 +1,6 @@
 const express = require('express');
 const http = require('http');
-const socketIo = require('socket.io');
+const WebSocket = require('ws');
 const cors = require('cors');
 const swaggerUi = require('swagger-ui-express');
 const swaggerSpecs = require('./config/swagger');
@@ -12,20 +12,11 @@ const { authenticateSocket } = require('./middleware/auth');
 const authRoutes = require('./routes/auth');
 const todoRoutes = require('./routes/todos');
 
-// Import socket handlers
-const todoSocketHandlers = require('./sockets/todoHandlers');
+// Import WebSocket handlers
+const { handleWebSocketConnection } = require('./websockets/wsHandlers');
 
 const app = express();
 const server = http.createServer(app);
-
-// Configure Socket.IO with CORS
-const io = socketIo(server, {
-  cors: {
-    origin: ['http://localhost:5173', 'http://localhost:3000'],
-    methods: ["GET", "POST"],
-    credentials: true
-  }
-});
 
 // Middleware
 app.use(cors({
@@ -82,39 +73,15 @@ app.get('/health', (req, res) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/todos', todoRoutes);
 
-// Socket.IO authentication middleware
-io.use(authenticateSocket);
+// Create WebSocket server
+const wss = new WebSocket.Server({
+  server,
+  path: '/ws'
+});
 
-// Socket.IO connection handling
-io.on('connection', (socket) => {
-  console.log(`✅ User ${socket.user.username} connected via WebSocket`);
-  
-  // Join user to their personal room
-  socket.join(`user_${socket.user._id}`);
-  
-  // Register todo event handlers
-  todoSocketHandlers(socket, io);
-  
-  // Handle disconnection
-  socket.on('disconnect', (reason) => {
-    console.log(`❌ User ${socket.user.username} disconnected: ${reason}`);
-  });
-  
-  // Handle connection errors
-  socket.on('error', (error) => {
-    console.error(`🔥 Socket error for user ${socket.user.username}:`, error);
-  });
-  
-  // Send welcome message
-  socket.emit('connected', {
-    success: true,
-    message: 'Connected to Todo API WebSocket',
-    user: {
-      _id: socket.user._id,
-      username: socket.user.username,
-      email: socket.user.email
-    }
-  });
+// Handle WebSocket connections
+wss.on('connection', (ws, request) => {
+  handleWebSocketConnection(ws, request, wss);
 });
 
 // Error handling middleware

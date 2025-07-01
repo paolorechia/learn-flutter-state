@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { useSocket } from './useSocket';
+import { useSocket, MESSAGE_TYPES } from './useSocket';
 import axios from 'axios';
 
 const API_BASE_URL = 'http://localhost:3000/api';
@@ -11,74 +11,35 @@ export const useTodos = () => {
   const [error, setError] = useState(null);
   const { emit, on, off, connected } = useSocket();
 
-  // Load todos on mount and when socket connects
-  useEffect(() => {
-    if (connected) {
-      loadTodos();
-      loadStats();
-    }
-  }, [connected]);
-
-  // Set up real-time event listeners
-  useEffect(() => {
-    if (connected) {
-      // Listen for real-time updates
-      on('todos:created', (data) => {
-        console.log('📝 Todo created via WebSocket:', data);
-        if (data.success) {
-          setTodos(prev => [data.data.todo, ...prev]);
-          loadStats(); // Refresh stats
-        }
-      });
-
-      on('todos:updated', (data) => {
-        console.log('✏️ Todo updated via WebSocket:', data);
-        if (data.success) {
-          setTodos(prev => prev.map(todo => 
-            todo._id === data.data.todo._id ? data.data.todo : todo
-          ));
-          loadStats(); // Refresh stats
-        }
-      });
-
-      on('todos:deleted', (data) => {
-        console.log('🗑️ Todo deleted via WebSocket:', data);
-        if (data.success) {
-          setTodos(prev => prev.filter(todo => todo._id !== data.data.id));
-          loadStats(); // Refresh stats
-        }
-      });
-
-      // Cleanup listeners
-      return () => {
-        off('todos:created');
-        off('todos:updated');
-        off('todos:deleted');
-      };
-    }
-  }, [connected, on, off]);
-
-  const loadTodos = useCallback(() => {
+  // Define loadStats first to avoid circular dependency
+  const loadStats = useCallback(async () => {
     if (!connected) {
-      // Fallback to REST API
-      loadTodosREST();
+      loadStatsREST();
       return;
     }
 
-    setLoading(true);
-    setError(null);
-
-    emit('todos:list', {}, (response) => {
-      setLoading(false);
-      if (response.success) {
-        setTodos(response.data.todos);
+    try {
+      const response = await emit(MESSAGE_TYPES.TODOS_STATS, {});
+      if (response.success && response.data.stats) {
+        setStats(response.data.stats);
       } else {
-        setError(response.message);
-        // Fallback to REST API
-        loadTodosREST();
+        loadStatsREST();
       }
-    });
+    } catch (error) {
+      loadStatsREST();
+    }
   }, [connected, emit]);
+
+  const loadStatsREST = async () => {
+    try {
+      const response = await axios.get(`${API_BASE_URL}/todos/stats/summary`);
+      if (response.data.success) {
+        setStats(response.data.data.stats);
+      }
+    } catch (error) {
+      console.error('Error loading stats via REST:', error);
+    }
+  };
 
   const loadTodosREST = async () => {
     try {
@@ -98,31 +59,87 @@ export const useTodos = () => {
     }
   };
 
-  const loadStats = useCallback(() => {
+  const loadTodos = useCallback(async () => {
     if (!connected) {
-      loadStatsREST();
+      // Fallback to REST API
+      loadTodosREST();
       return;
     }
 
-    emit('todos:stats', {}, (response) => {
-      if (response.success) {
-        setStats(response.data.stats);
-      } else {
-        loadStatsREST();
-      }
-    });
-  }, [connected, emit]);
+    setLoading(true);
+    setError(null);
 
-  const loadStatsREST = async () => {
     try {
-      const response = await axios.get(`${API_BASE_URL}/todos/stats/summary`);
-      if (response.data.success) {
-        setStats(response.data.data.stats);
+      const response = await emit(MESSAGE_TYPES.TODOS_LIST, {});
+      setLoading(false);
+      if (response.success && response.data.todos) {
+        setTodos(response.data.todos);
+      } else {
+        setError(response.data?.message || 'Failed to load todos');
+        // Fallback to REST API
+        loadTodosREST();
       }
     } catch (error) {
-      console.error('Error loading stats via REST:', error);
+      setLoading(false);
+      setError('Failed to load todos');
+      loadTodosREST();
     }
-  };
+  }, [connected, emit]);
+
+  // Load todos on mount and when socket connects
+  useEffect(() => {
+    if (connected) {
+      loadTodos();
+      loadStats();
+    }
+  }, [connected, loadTodos, loadStats]);
+
+  // Set up real-time event listeners
+  useEffect(() => {
+    if (connected) {
+      // Listen for real-time updates
+      const handleTodoCreated = (data) => {
+        console.log('📝 Todo created via WebSocket:', data);
+        if (data.todo) {
+          setTodos(prev => [data.todo, ...prev]);
+          loadStats(); // Refresh stats
+        }
+      };
+
+      const handleTodoUpdated = (data) => {
+        console.log('✏️ Todo updated via WebSocket:', data);
+        if (data.todo) {
+          setTodos(prev => prev.map(todo =>
+            todo._id === data.todo._id ? data.todo : todo
+          ));
+          loadStats(); // Refresh stats
+        }
+      };
+
+      const handleTodoDeleted = (data) => {
+        console.log('🗑️ Todo deleted via WebSocket:', data);
+        if (data.id) {
+          setTodos(prev => prev.filter(todo => todo._id !== data.id));
+          loadStats(); // Refresh stats
+        }
+      };
+
+      on(MESSAGE_TYPES.TODO_CREATED, handleTodoCreated);
+      on(MESSAGE_TYPES.TODO_UPDATED, handleTodoUpdated);
+      on(MESSAGE_TYPES.TODO_DELETED, handleTodoDeleted);
+
+      // Cleanup listeners
+      return () => {
+        off(MESSAGE_TYPES.TODO_CREATED, handleTodoCreated);
+        off(MESSAGE_TYPES.TODO_UPDATED, handleTodoUpdated);
+        off(MESSAGE_TYPES.TODO_DELETED, handleTodoDeleted);
+      };
+    }
+  }, [connected, on, off, loadStats]);
+
+
+
+
 
   const createTodo = useCallback(async (todoData) => {
     if (!connected) {
@@ -132,18 +149,23 @@ export const useTodos = () => {
     setLoading(true);
     setError(null);
 
-    return new Promise((resolve) => {
-      emit('todos:create', todoData, (response) => {
-        setLoading(false);
-        if (response.success) {
-          // Todo will be added via real-time event
-          resolve({ success: true });
-        } else {
-          setError(response.message);
-          resolve({ success: false, message: response.message });
-        }
-      });
-    });
+    try {
+      const response = await emit(MESSAGE_TYPES.TODOS_CREATE, todoData);
+      setLoading(false);
+      if (response.success) {
+        // Todo will be added via real-time event
+        return { success: true };
+      } else {
+        const message = response.data?.message || 'Failed to create todo';
+        setError(message);
+        return { success: false, message };
+      }
+    } catch (error) {
+      setLoading(false);
+      const message = 'Failed to create todo';
+      setError(message);
+      return { success: false, message };
+    }
   }, [connected, emit]);
 
   const createTodoREST = async (todoData) => {
@@ -176,18 +198,23 @@ export const useTodos = () => {
     setLoading(true);
     setError(null);
 
-    return new Promise((resolve) => {
-      emit('todos:update', { id, ...updateData }, (response) => {
-        setLoading(false);
-        if (response.success) {
-          // Todo will be updated via real-time event
-          resolve({ success: true });
-        } else {
-          setError(response.message);
-          resolve({ success: false, message: response.message });
-        }
-      });
-    });
+    try {
+      const response = await emit(MESSAGE_TYPES.TODOS_UPDATE, { id, ...updateData });
+      setLoading(false);
+      if (response.success) {
+        // Todo will be updated via real-time event
+        return { success: true };
+      } else {
+        const message = response.data?.message || 'Failed to update todo';
+        setError(message);
+        return { success: false, message };
+      }
+    } catch (error) {
+      setLoading(false);
+      const message = 'Failed to update todo';
+      setError(message);
+      return { success: false, message };
+    }
   }, [connected, emit]);
 
   const updateTodoREST = async (id, updateData) => {
@@ -222,18 +249,23 @@ export const useTodos = () => {
     setLoading(true);
     setError(null);
 
-    return new Promise((resolve) => {
-      emit('todos:delete', { id }, (response) => {
-        setLoading(false);
-        if (response.success) {
-          // Todo will be removed via real-time event
-          resolve({ success: true });
-        } else {
-          setError(response.message);
-          resolve({ success: false, message: response.message });
-        }
-      });
-    });
+    try {
+      const response = await emit(MESSAGE_TYPES.TODOS_DELETE, { id });
+      setLoading(false);
+      if (response.success) {
+        // Todo will be removed via real-time event
+        return { success: true };
+      } else {
+        const message = response.data?.message || 'Failed to delete todo';
+        setError(message);
+        return { success: false, message };
+      }
+    } catch (error) {
+      setLoading(false);
+      const message = 'Failed to delete todo';
+      setError(message);
+      return { success: false, message };
+    }
   }, [connected, emit]);
 
   const deleteTodoREST = async (id) => {
